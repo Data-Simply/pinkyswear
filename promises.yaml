@@ -1,0 +1,104 @@
+nodes:
+- id: b3f8dfb6-de4d-48d6-8251-2023fedf2dfe
+  title: promise is a trustworthy, evidence-backed CLI
+  parent: null
+  affects: []
+  verifiers: []
+- id: 802698f3-2f02-4148-8ae3-f8114639c19f
+  title: The verification engine is correct
+  parent: b3f8dfb6-de4d-48d6-8251-2023fedf2dfe
+  affects:
+  - pinkyswear/engine.py
+  verifiers: []
+- id: 4024cfb2-45fb-4f66-9919-bcce1f8459f3
+  title: The YAML is only ever written safely
+  parent: b3f8dfb6-de4d-48d6-8251-2023fedf2dfe
+  affects:
+  - pinkyswear/model.py
+  - pinkyswear/cli.py
+  verifiers: []
+- id: db618832-8f2c-483f-87e1-3baf746e2974
+  title: The codebase stays clean and well-formed
+  parent: b3f8dfb6-de4d-48d6-8251-2023fedf2dfe
+  affects: []
+  verifiers: []
+- id: 5b2086bc-e0d4-43ca-bc6c-b6347b6765d3
+  title: Deleting a backing test turns its promise red
+  parent: 802698f3-2f02-4148-8ae3-f8114639c19f
+  affects:
+  - pinkyswear/engine.py
+  - tests/test_engine.py
+  verifiers:
+  - run: uv run pytest tests/test_engine.py::TestDeletionDetection -q
+    scope: repo
+    blocking: true
+    timeout: 300
+- id: 89ee8648-7cce-4449-b16a-bafc6e7b9770
+  title: Rollup and breaks propagate correctly
+  parent: 802698f3-2f02-4148-8ae3-f8114639c19f
+  affects:
+  - pinkyswear/engine.py
+  verifiers:
+  - run: uv run pytest tests/test_engine.py::TestRollup -q
+    scope: repo
+    blocking: true
+    timeout: 300
+- id: 6cb38886-90f0-4c9f-b6e9-79f34d486cae
+  title: Exit codes separate fact from policy
+  parent: 802698f3-2f02-4148-8ae3-f8114639c19f
+  affects:
+  - pinkyswear/engine.py
+  verifiers:
+  - run: uv run pytest tests/test_engine.py::TestExitCodePolicy -q
+    scope: repo
+    blocking: true
+    timeout: 300
+- id: bc96f474-a5fa-4de0-9a17-59b3971b6481
+  title: mv refuses to create cycles
+  parent: 4024cfb2-45fb-4f66-9919-bcce1f8459f3
+  affects:
+  - pinkyswear/cli.py
+  - pinkyswear/check.py
+  verifiers:
+  - run: uv run pytest tests/test_cli.py::TestMove -q tests/test_check.py -q
+    scope: repo
+    blocking: true
+    timeout: 300
+- id: 7cc05d01-e75f-430e-9f66-767aac591605
+  title: rm refuses to orphan children
+  parent: 4024cfb2-45fb-4f66-9919-bcce1f8459f3
+  affects:
+  - pinkyswear/cli.py
+  verifiers:
+  - run: uv run pytest 'tests/test_cli.py::TestRemove' -q
+    scope: repo
+    blocking: true
+    timeout: 300
+- id: c92c0e7b-e402-4e47-87b4-d943418d0991
+  title: Verifiers and nodes are validated on load
+  parent: 4024cfb2-45fb-4f66-9919-bcce1f8459f3
+  affects:
+  - pinkyswear/model.py
+  verifiers:
+  - run: uv run pytest tests/test_model.py -q
+    scope: repo
+    blocking: true
+    timeout: 300
+- id: 43db3375-99ff-4cd9-b638-548c9b72d474
+  title: Code passes lint
+  parent: db618832-8f2c-483f-87e1-3baf746e2974
+  affects: []
+  verifiers:
+  - run: uv run ruff check .
+    scope: artifact
+    blocking: true
+    timeout: 300
+- id: d551792d-4f4b-44ec-8dac-4930912b1ae1
+  title: Code is formatted
+  parent: db618832-8f2c-483f-87e1-3baf746e2974
+  affects: []
+  verifiers:
+  - run: uv run ruff format --check .
+    scope: artifact
+    blocking: true
+    timeout: 300

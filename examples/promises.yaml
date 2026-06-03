@@ -1,0 +1,64 @@
+# Example promise document for a small todo app.
+#
+# Build it with the CLI rather than editing by hand:
+#   promise -f examples/promises.yaml add "Users can manage their todos and trust it"
+#   promise -f examples/promises.yaml add "Data is never silently lost" --parent "trust it"
+#   promise -f examples/promises.yaml add "A failed update doesn't corrupt the list" \
+#       --parent "never silently lost" --scope repo \
+#       --verify "uv run pytest tests/test_storage_rollback.py -q" \
+#       --affects todo-app/storage.py --affects tests/test_storage_rollback.py
+#
+# Then:
+#   promise -f examples/promises.yaml verify           # human summary
+#   promise -f examples/promises.yaml verify --json     # compact, for agents
+#   promise -f examples/promises.yaml impact todo-app/storage.py
+nodes:
+  - id: 7f3a9c2e-0000-0000-0000-000000000001
+    title: Users can manage their todo list and trust it
+    parent: null
+    affects:
+      - todo-app/
+    verifiers: []
+
+  - id: b1d4e8a0-0000-0000-0000-000000000002
+    title: A user's data is never silently lost or corrupted
+    parent: 7f3a9c2e-0000-0000-0000-000000000001
+    affects:
+      - todo-app/storage.py
+    verifiers: []
+
+  - id: 4c9f1a77-0000-0000-0000-000000000003
+    title: A failed update doesn't corrupt the list
+    parent: b1d4e8a0-0000-0000-0000-000000000002
+    affects:
+      - todo-app/storage.py
+      - tests/test_storage_rollback.py
+    verifiers:
+      - run: uv run pytest tests/test_storage_rollback.py -q
+        scope: repo
+        blocking: true
+        timeout: 120
+
+  - id: a8e2b350-0000-0000-0000-000000000004
+    title: Saving a todo feels instant (p95 < 150ms)
+    parent: 7f3a9c2e-0000-0000-0000-000000000001
+    affects:
+      - todo-app/api.py
+      - checkout latency
+    verifiers:
+      - run: scripts/check_p95.sh --endpoint /todos --threshold-ms 150
+        scope: runtime
+        blocking: false
+        timeout: 300
+
+  - id: e6017fbc-0000-0000-0000-000000000005
+    title: We ship no known-vulnerable dependencies
+    parent: 7f3a9c2e-0000-0000-0000-000000000001
+    affects:
+      - uv.lock
+      - SOC2 compliance
+    verifiers:
+      - run: scripts/dependabot_gate.sh --fail-on high
+        scope: external
+        blocking: true
+        timeout: 60
