@@ -12,7 +12,7 @@ license = "Elastic-2.0"
 name = "pinkyswear"
 readme = "README.md"
 requires-python = ">=3.11"
-version = "0.1.0"
+version = "0.1.1"
 
 [[project.authors]]
 email = "2493311+mvanwyk@users.noreply.github.com"
