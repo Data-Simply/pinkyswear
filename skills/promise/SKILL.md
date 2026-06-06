@@ -122,7 +122,7 @@ A verifier:
 |------------|---------|
 | `run`      | shell command; exit 0 = pass, non-zero = fail |
 | `scope`    | `repo` · `artifact` · `deploy` · `runtime` · `external` (metadata; seeds `blocking`) |
-| `blocking` | whether a failure gates the exit code (repo/artifact default true; deploy/runtime default false; external must be explicit) |
+| `blocking` | whether failure gates exit code (default: repo/artifact true, deploy/runtime false, external explicit) |
 | `cwd`      | working dir relative to repo root (default: repo root) |
 | `timeout`  | seconds before the command is killed and failed (default 300) |
 
